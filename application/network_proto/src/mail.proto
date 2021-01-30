@@ -1,0 +1,69 @@
+package network;
+import "item.proto";
+
+// des:邮件初始化更新
+// id:40
+message sc_mails_init_update{
+    repeated pb_mail sys_mails = 1;     // 系统邮件
+}
+
+// 邮件结构
+message pb_mail{
+    required    string   mail_id = 1;
+    required    uint32   cls = 2;   // 类别
+    required    bytes   title   = 3;
+    required    bytes   content   = 4;
+    required    bool   read   = 5;      // true为已读
+    required    uint32   receive_date = 6;   // 接收时间
+    required    uint32   expire_date = 7;    //到期时间
+    repeated   pb_reward_info  reward_list = 8;   // 空则无奖励
+}
+
+
+// des:发系统邮件
+// id:41
+message sc_mail_add{
+    required   pb_mail add_sys_mail = 1;
+}
+
+// des:删除邮件
+// id:42
+message cs_mail_delete_request
+{
+    required    string  mail_id = 1;
+    optional    string  request_mark = 2;
+}
+
+// des:删除邮件返回
+// id:43
+message sc_mail_delete_reply
+{
+    required uint32 result = 1;     				// 0成功 非0失败
+    optional bytes	err_msg = 2;    				// 失败的提示信息
+    optional string request_mark = 3;
+}
+
+// des:读邮件
+// id:44
+message cs_read_mail
+{
+    required    string  mail_id = 1;
+}
+
+
+// des:领取邮件的请求
+// id:45
+message cs_mail_draw_request{
+    repeated    string  mail_ids = 1;               //  这里只能填一个
+    optional    string  request_mark = 2;
+}
+
+// des:领取邮件返回
+// id:46
+message sc_mail_draw_reply
+{
+    required uint32 result = 1;     				// 0成功 非0失败
+    optional bytes	err_msg = 2;    				// 失败的提示信息
+    repeated pb_reward_info reward_info_s   =   3;
+    optional string request_mark = 4;
+}

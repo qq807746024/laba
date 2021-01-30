@@ -1,0 +1,101 @@
+// -------------------------
+// 活动公告消息
+// -------------------------
+
+package network;
+import "item.proto";
+
+// des:活动配置 只登入时下发
+// id:250
+message sc_activity_config_info_update{
+    repeated pb_activity_config activity_list = 1;      // 活动配置列表
+    required uint32 hide_function_flag = 2;       // 0开启 1屏蔽
+}
+
+// des:活动配置
+message pb_activity_config{
+    required pb_activity_data activity_data = 1;				// 活动数据
+    repeated pb_sub_activity_config sub_list = 2; 		// 条目配置
+}
+
+// des: 活动子配置
+message pb_sub_activity_config{
+    required uint32 id = 1;				// 活动id
+    required uint64 data = 2;			// 使用数据
+    repeated pb_reward_info reward_list = 3;    // 奖励数据
+}
+
+// des: 活动数据
+message pb_activity_data{
+    required uint32 id = 1;
+    required uint64 current_data = 2;	   // 当前数据
+    repeated uint32 draw_info_list = 3; 		// 已领id列表
+}
+
+// des:活动数据查询
+// id:251
+message cs_activity_info_query_req{
+    required uint32 id = 1;
+}
+
+// des:活动数据查询 返回
+// id:252
+message sc_activity_info_query_reply{
+    required pb_activity_data activity_data = 1;      // 活动数据
+}
+
+// des:活动领奖
+// id:253
+message cs_activity_draw_req{
+    required uint32 activity_id = 1;        // 活动id
+    required uint32 sub_id = 2;     // 子id
+}
+
+// des:活动领奖
+// id:254
+message sc_activity_draw_reply{
+    required uint32 result = 1;        // 0成功 1失败
+    required bytes err = 2;        // 错误描述
+    repeated pb_reward_info reward_list = 3;    // 奖励数据
+    required uint32 activity_id = 4;        // 活动id
+    required uint32 sub_id = 5;     // 子id
+}
+
+
+
+// des:公告配置 (没用了)
+message pb_annoucement_config{
+    required uint32 id = 1;
+    required bytes title = 2;
+    required bytes content = 3;
+}
+
+// des:一本万利
+// id:257
+message cs_task_pay_award_request{
+    required int32 index = 1;		// 档位(1开始)
+}
+
+// des:一本万利返回
+// id:258
+message sc_task_pay_award_response{
+    required uint32 result = 1;        // 0成功 1失败
+    required bytes err = 2;        // 错误描述
+    repeated pb_reward_info reward_list = 3;    // 奖励数据
+}
+
+// des:一本万利
+// id:259
+message sc_task_pay_info_response{
+    required int32 task_id = 1;		// 任务编号
+    required string process = 2;	// 进度度
+    repeated int32 status = 3;		// 奖励已领的index
+    required int32 open = 4;		// 未开放2 是否购买(0 否, 1 是)
+}
+
+
+// des:一本万利查询
+// id:264
+message cs_task_pay_info_request{
+
+}

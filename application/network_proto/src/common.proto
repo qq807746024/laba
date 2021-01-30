@@ -1,0 +1,52 @@
+// -------------------------
+// common协议
+// -------------------------
+
+package network;
+
+// des:心跳协议
+// id:8
+message cs_common_heartbeat{
+}
+
+// des:心跳协议返回
+// id:9
+message sc_common_heartbeat_reply{
+	required uint32 now_time = 1;
+}
+
+// des:更新客户端已接收的协议计数
+// id:10
+message cs_common_proto_count{
+	required uint32 count = 1;
+}
+
+// des:更新服务端已接收的协议计数
+// id:11
+message sc_common_proto_count{
+	required uint32 count = 1;
+}
+
+// des:通知服务端清理协议缓存
+// id:12
+message cs_common_proto_clean{
+	required uint32 count = 1;
+}
+
+// des:通知客户端清理协议缓存
+// id:13
+message sc_common_proto_clean{
+	required uint32 count = 1;	
+}
+
+// des:玩家BUG反馈
+// id:28
+message cs_common_bug_feedback{
+	required bytes content = 1;							// 内容
+}
+
+// des:玩家BUG反馈返回
+// id:29
+message sc_common_bug_feedback{
+	required uint32 result = 1;							// 返回结果：1 成功 2 cd时间不得低于60s 3 Bug内容字数限制 4 其他原因提交失败
+}

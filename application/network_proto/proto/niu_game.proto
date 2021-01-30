@@ -1,0 +1,257 @@
+package network;
+import "item.proto";
+
+
+// des:房间状态同步 接收到时开始倒计时
+// id:50
+message sc_niu_room_state_update{
+    //进入的状态id
+    // 5大阶段
+    //1.准备阶段:   10等待新玩家加入(当前房间只有一个人时才会收到该消息), 11牌局开始倒计时(此时也会有玩家加入进来)
+    //2.选庄阶段(不显示倒计时):  20发牌后1s客户端自动处理抢庄倒计时, 21显示庄家选择动画
+    //3.闲家下注阶段:  30下注
+    //4.补牌开牌阶段:   40补牌
+    //5.结算阶段:    50结算
+    required uint32 state_id = 1;
+    required uint32 end_sec_time = 2;           //倒计时结束时间戳 (会提前停止倒计时)
+
+    repeated pb_poker_card open_card_list = 3;      // id=20时 有该数据
+    optional uint32 master_pos = 4;      // id = 21时 庄家位置
+    optional pb_poker_card last_card_info = 5;      //  id=40 补牌数据
+    optional game_over_settlement settle_list = 6;           //id = 50 结算数据
+}
+
+
+// des:玩家进入房间
+// id:51
+message cs_niu_enter_room_req{
+    required uint32 room_type = 1;      // 房间类型 红包场type = 10
+}
+
+// des:玩家进入房间返回
+// id:52
+message sc_niu_enter_room_reply{
+    required uint32 result = 1;      // 0成功
+    required uint32 my_pos = 2;      // 我的位置
+}
+
+// des:新加入的玩家信息更新
+// id:53
+message sc_niu_enter_room_player_info_update{
+    repeated pb_niu_player_info player_list = 1;
+}
+
+// des:抢庄 选倍率
+// id:54
+message cs_niu_choose_master_rate_req{
+    required uint32 rate_num = 1;      // 倍率
+}
+
+// des:抢庄 选倍率返回
+// id:55
+message sc_niu_choose_master_rate_reply{
+    required uint32 result = 1;      // 0成功
+    optional bytes err = 2;     // 错误信息
+}
+
+// des:抢庄 选倍率信息更新
+// id:56
+message sc_niu_player_choose_master_rate_update{
+    required uint32 pos = 1;
+    required uint32 rate_num = 2;
+}
+
+// des:闲家下注
+// id:57
+message cs_niu_choose_free_rate_req{
+    required uint32 rate_num = 1;      // 倍率
+    required int32 test_type = 2; // 试玩场标识
+}
+
+// des:闲家下注返回
+// id:58
+message sc_niu_choose_free_rate_reply{
+    required uint32 result = 1;      // 0成功
+    optional bytes err = 2;     // 错误信息
+}
+
+// des:闲家下注更新
+// id:59
+message sc_niu_player_choose_free_rate_update{
+    required uint32 pos = 1;
+    required uint32 rate_num = 2;
+}
+
+// des:玩家离开房间(  发完该消息后切勿在发送在玩同步消息  )
+// id:60
+message cs_niu_leave_room_req{
+}
+
+// des:玩家离开返回
+// id:61
+message sc_niu_leave_room_reply{
+    required uint32 result = 1;      // 0成功
+}
+
+// des:离开玩家位置更新
+// id:62
+message sc_niu_leave_room_player_pos_update{
+    required uint32 leave_pos = 1;      // 离开的玩家位置位置
+}
+
+// des:提交牌型
+// id:63
+message cs_niu_submit_card_req{
+}
+
+// des:提交牌型返回
+// id:64
+message sc_niu_submit_card_reply{
+    required uint32 result = 1;      // 0成功
+}
+
+// des:提交牌型更新
+// id:65
+message sc_niu_player_submit_card_update{
+    required uint32 player_pos = 1;      //玩家位置
+    required uint32 card_type = 2;      // 牌型0->10对应没牛->牛牛 11:4炸 12:5大牛 13:5小牛
+    repeated pb_poker_card card_list = 3;   // 5张牌
+}
+
+// des:玩家在玩牛牛状态通知消息 无返回(收到20状态消息后发该消息即可)
+// id:66
+message cs_niu_syn_in_game_state_req{
+}
+
+// des:查询玩家房间状态信息 返回下面的消息
+// id:72
+message cs_niu_query_player_room_info_req{
+}
+
+// des:登入时通知客户端上局游戏是否还在继续
+// id:67
+message sc_niu_player_room_info_update{
+    required uint32 room_id = 1;      // >0 时有房间
+    required uint32 enter_end_time = 2;      // 可进入的结束时间戳
+}
+
+// des:返回房间下发的更新消息 只发给进入玩家
+// id:68
+message sc_niu_player_back_to_room_info_update{
+    required uint32 state_id = 1;
+    required uint32 end_sec_time = 2;           //倒计时结束时间戳 (会提前停止倒计时)
+    repeated pb_niu_player_info player_list = 3;      // 玩家信息
+    optional uint32 master_pos = 4;      // id > 20时 庄家位置
+    required uint32 my_pos = 5;      // 我的位置
+}
+
+
+// des:牌数据
+message pb_poker_card{
+    required uint32 number = 1;     //1-13
+    required uint32 color = 2;      //4黑桃 3红桃 2梅花 1方块
+}
+
+// des:玩家结算信息
+message game_over_settlement{
+    repeated pb_settle_info all_player_settle_info = 1;      //闲家的奖励情况
+}
+
+// des:玩家下注信息
+message pb_settle_info{
+    required uint32 player_pos = 1;     // 玩家位置
+    required int64 reward_num = 2;   // 玩家奖励
+    required uint32 card_type = 3;   // 牌型:牛几
+    repeated pb_poker_card card_list = 4;   // 5张牌
+}
+
+
+// des:玩家信息结构
+message pb_niu_player_info{
+    required uint32 pos = 1;
+    required string player_uuid = 2;
+    required uint64 gold_num = 3;
+    required uint32 icon_type = 4;
+    optional string icon_url = 5;
+    optional bytes player_name = 6;
+    optional uint32 master_rate = 7;    // 重连消息中使用 庄家
+    optional uint32 free_rate = 8;      // 重连消息中使用 闲家
+    repeated pb_poker_card open_card_list = 9;      // 重连消息中使用 牌数据
+    optional uint32 card_type = 10;      // 重连消息中使用 牌类型
+    required uint32 vip_level = 11;      // vip等级
+    required uint32 sex = 12;      // 0男 1女
+}
+
+
+
+// 红包场消息
+///////// 以上消息跟看牌抢庄一样 ( 仅niu->redpack ) ///////////////
+///////// 下面是新增消息
+
+// des:房间次数消息 登入时 , 变化时 , 隔天时 同步
+// id:160
+message sc_redpack_room_reset_times_update{
+    required uint32 left_reset_times = 1;   //剩余重置次数
+    required uint32 reset_seconds = 2;   //重置次数时间
+
+    required uint32 reset_mission_is_draw = 3;   //  1已领 0没领
+}
+
+// des:当前局数信息 进房间 变化时 登入 同步
+// id:161
+message sc_redpack_room_player_times_update{
+    required uint32 now_play_times = 1;   //已玩次数
+}
+
+// des:红包可领取状态同步 收到该消息后一段时间内显示可领取红包
+// id:162
+message sc_redpack_room_redpack_notice_update{
+    required uint32 close_draw_second = 1;   // 关闭红包领奖时间
+    required uint32 next_open_redpack_second = 2;      //  下次开奖时间
+}
+
+// des:红包领取请求
+// id:163
+message cs_redpack_room_draw_req{
+}
+
+// des:红包领取请求 返回
+// id:164
+message sc_redpack_room_draw_reply{
+    required uint32 result = 1;      // 0成功
+    required bytes err = 2;      // 错误描述
+    repeated pb_reward_info reward = 3; // 奖励
+
+    required uint32 next_can_draw_second = 4;      // 下次可领奖时间
+}
+
+// des:进房间时同步的领奖时间
+// id:165
+message sc_redpack_redpack_timer_sec_update{
+    required uint32 next_can_draw_second = 1;      // 下次可领奖时间
+    required uint32 next_open_redpack_second = 2;      //  下次开奖时间
+}
+
+// des:红包场复活
+// id:166
+message cs_redpack_relive_req{
+}
+
+// des:红包场复活返回
+// id:167
+message sc_redpack_relive_reply{
+    required uint32 result = 1;      // 0成功
+    required bytes err = 2;      // 错误描述
+}
+
+// des:红包场复活剩余次数
+// id:168
+message sc_redpack_relive_times{
+    required uint32 times = 1;      //
+}
+
+// des:福袋池更新
+// id:169
+message sc_fudai_pool_update{
+    required int32 num = 1; //
+}

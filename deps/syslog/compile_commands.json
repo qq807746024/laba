@@ -1,0 +1,6 @@
+[
+{ "file"      : "c_src/syslog_drv.c"
+, "directory" : "/ErlangDev/src/deps/syslog"
+, "command"   : "cc -c -DOPENSSL_NO_EC=1 -g -Wall -fPIC -MMD -I\"/ErlangDev/erLang_R16B03/lib/erl_interface-3.7.15/include\" -I\"/ErlangDev/erLang_R16B03/erts-5.10.4/include\" c_src/syslog_drv.c -o c_src/syslog_drv.o"
+}
+]

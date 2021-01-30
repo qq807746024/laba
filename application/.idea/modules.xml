@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/db/db.iml" filepath="$PROJECT_DIR$/db/db.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gate/gate.iml" filepath="$PROJECT_DIR$/gate/gate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gateway/gateway.iml" filepath="$PROJECT_DIR$/gateway/gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/http_server/http_server.iml" filepath="$PROJECT_DIR$/http_server/http_server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/login/login.iml" filepath="$PROJECT_DIR$/login/login.iml" />
+      <module fileurl="file://$PROJECT_DIR$/network_proto/network_proto.iml" filepath="$PROJECT_DIR$/network_proto/network_proto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slogger/slogger.iml" filepath="$PROJECT_DIR$/slogger/slogger.iml" />
+      <module fileurl="file://$PROJECT_DIR$/statistic_server/statistic_server.iml" filepath="$PROJECT_DIR$/statistic_server/statistic_server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/util/util.iml" filepath="$PROJECT_DIR$/util/util.iml" />
+    </modules>
+  </component>
+</project>

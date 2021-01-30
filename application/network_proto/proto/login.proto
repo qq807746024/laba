@@ -1,0 +1,69 @@
+package network;
+
+// des:请求登陆
+// id:1
+message cs_login{
+	required uint32 platform_flag = 1;	// 平台标识：1开发服 2外网测试服
+	required string uid = 2;			// 账号的唯一标识
+
+    required bytes password = 3;
+	required string sz_param = 4;    	//参数内容 如"abc"
+	
+	// 客户端信息
+	required string version = 5;		// 客户端版本
+	required string network_type = 6;	// 连网类型
+	required uint32 sys_type = 7;		// 系统类型  0-Windows 1-Android 2-iOS 3-WindowsPhone
+	required uint32 chnid = 8;			// 主渠道号
+	required uint32 sub_chnid = 9;		// 副渠道号
+	required string ios_idfa = 10;		// ios广告标示符
+	required string ios_idfv = 11;		// iosVindor标示符
+	required string mac_address = 12;	// 物理地址
+	required string device_type = 13;	// 设备机型
+}
+
+
+// des:登陆返回 
+// id:2
+message sc_login_reply{
+	required uint32 result = 1;			// 0失败 1成功 2进入"第一场战斗" 99排队等待
+	required bytes reason = 2;			// 失败原因
+	required string reconnect_key = 3;	// 登录成功后返回重连密码
+	required bytes proto_key = 4;		// 协议密钥
+}
+
+
+// des:退出登陆 
+// id:3 
+message cs_login_out{
+}
+
+
+// des:请求重连  
+// id:4
+message cs_login_reconnection{
+	required uint32 platform_flag = 1;
+    required string user = 2;
+	required string reconnect_key = 3;	// 重连密码
+}
+
+
+// des:请求重连返回  
+// id:5
+message sc_login_reconnection_reply{
+	required uint32 result = 1;			// 0失败 1成功
+	required bytes reason = 2;			// 失败原因
+	required bytes proto_key = 3;		// 协议密钥
+}
+
+
+// des:重复登陆
+//  id:6 
+message sc_login_repeat{
+}
+
+
+// des:登陆协议全部发送成功  
+// id:7
+message sc_login_proto_complete{
+    required bool is_new_player = 1;			// 是否新玩家
+}

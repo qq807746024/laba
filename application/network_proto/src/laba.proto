@@ -1,0 +1,191 @@
+package network;
+
+// des:进入房间
+// id:201
+message cs_laba_enter_room_req {
+  required int32 type = 1; // 1 - 水果；2-超级水果
+  required int32 test_type = 2;
+}
+
+// des:进入房间返回
+// id:202
+message sc_laba_enter_room_reply {
+  required uint32 line_num = 1;        // 上次投注设置线数
+  required uint32 line_set_chips = 2;  //上次投注设置投入
+  required uint32 last_free_times = 3; //剩余免费次数
+  required int32 type = 4;             // 1 - 水果；2-超级水果
+  optional int32 start_time = 5;       // 开始时间
+  optional int32 end_time = 6;         // 结束时间
+}
+
+// des:离开房间
+// id:203
+message cs_laba_leave_room_req {
+  required int32 type = 1; // 1 - 水果；2-超级水果
+}
+
+// des:离开房间返回 玩家下线时检测 从容器中去除
+// id:204
+message sc_laba_leave_room_reply {
+  required uint32 result = 1; // 0成功
+}
+
+// des:奖池数量更新 发送给在房间的人
+// id:205
+message sc_laba_pool_num_update {
+  required string total_pool_num = 1; // 总奖池数
+  required string total_rank_num = 2; // 排行榜奖池数
+}
+
+// 最大奖玩家信息
+message pb_pool_win_player_info {
+  required string player_uuid = 1;
+  optional string icon_url = 2;
+  optional bytes player_name = 3; // 非庄家时为空
+  required uint32 vip_level = 4;
+  optional string win_gold = 5; // 获得金币
+  optional int32 c_time = 6;    // 获得金币
+}
+
+// des:投注
+// id:206
+message cs_laba_spin_req {
+  required uint32 line_num = 1;
+  required uint32 line_set_chips = 2;
+  required int32 type = 3; // 1 - 水果；2-超级水果
+  required int32 test_type = 4;
+}
+
+// des:投注返回
+// id:207
+message sc_laba_spin_reply {
+  required string total_reward_num = 1;         //总奖励
+  repeated pb_laba_fruit_info fruit_list = 2;   //摇奖信息
+  repeated pb_laba_line_reward reward_list = 3; // 无奖励时=[]
+  required uint32 new_last_free_times = 4;      // 剩余次数 没有=0
+  required uint32 pool = 5;                     // 1=触发奖池
+  required uint32 free = 6; //  1 免费5次  2 免费10次 3 免费15次
+}
+
+// 条奖励信息
+message pb_laba_fruit_info {
+  required uint32 pos_id = 1; // 1-15
+  required uint32 fruit_type =
+      2; // 1:香蕉,2:西瓜,3:柠檬,4:葡萄,5:幸运草,6:铃铛,7:樱桃,8:纱票,9:WILD钻石,10:BONUS橙子,11:7
+}
+
+// 条奖励信息
+message pb_laba_line_reward {
+  required uint32 line_id = 1;  // 1-9
+  required uint32 same_num = 2; // 相同数量
+}
+
+// des:中奖人信息
+// id:217
+message cs_win_player_list {
+  required int32 type = 1; // 1 - 水果；2-超级水果
+}
+
+// des:中奖人信息返回
+// id:218
+message sc_win_player_list {
+  repeated pb_pool_win_player_info win_players = 1; // 最大奖玩家信息
+}
+
+// des:进入房间
+// id:341
+message cs_airlaba_enter_room_req {
+  required cs_laba_enter_room_req laba_req = 1; // 原始 laba 进入协议
+  required uint32 base_bet_num = 2; // 空战触发 laba 功能的每次摇注金额
+  required uint32 base_line_num = 3; // 空战触发 laba 功能的每次摇注线数
+}
+
+message pb_airlaba_item_list_item {
+  required uint32 item_id = 1;
+  required uint32 item_num = 2;
+}
+
+// des:进入房间返回
+// id:342
+message sc_airlaba_enter_room_reply {
+  required sc_airlaba_enter_room_reply laba_resp = 1; // 原始 laba 进入返回协议
+  required pb_airlaba_item_list_item item_list = 2;
+}
+
+// des:离开房间
+// id:343
+message cs_airlaba_leave_room_req {
+  required cs_laba_leave_room_req laba_req = 1; //  原始 laba 退出协议
+}
+
+// des:离开房间返回 玩家下线时检测 从容器中去除
+// id:344
+message sc_airlaba_leave_room_reply {
+  required sc_laba_leave_room_reply laba_resp = 1; //  原始 laba 退出协议返回
+}
+
+// des: 开火
+// id:345
+message cs_airlaba_fire_bet_req {
+  required uint32 bullet_cost = 1; // 每一发子弹单价
+  required uint32 bullet_num = 2; // 一次打出几发子弹（目前固定传 1）、
+  required uint32 hit_objtype = 3;    // 命中的目标的类型
+  required uint32 hit_objid = 4;      // 命中目标的id
+  required uint32 bullet_item_id = 5; // 子弹类型
+}
+
+// des: 开火回复
+// id:346
+message sc_airlaba_fire_bet_reply {
+  required uint32 result = 1; // 结果（0 成功，否则失败）
+  required bytes desc = 2;
+  required bool target_down = 3; // 目标是否击毁
+  required uint32 earn_gold = 4; // 获得的金币
+  required uint32 hit_objid = 5; // 命中目标的id
+}
+
+// des: 切换阶段
+// id:347
+message cs_airlaba_switch_phase_req {}
+
+// des: 切换阶段回复
+// id:348
+message sc_airlaba_switch_phase_reply {}
+
+// des:空斩 laba 奖池数量更新 发送给在房间的人
+// id:349
+message sc_airlaba_pool_num_update {
+  required string pool_num = 1;      // 奖池数
+  required string rank_pool_num = 2; // 排行榜奖金数
+}
+
+// des: airlaba 使用道具
+// id:350
+message cs_airlaba_use_item_req {
+  required uint32 item_id = 1;  // 物品 id
+  required uint32 item_num = 2; // 使用物品数量
+  required uint32 order_id = 3; // 客户端唯一识别本次请求的 id
+}
+
+// des: airlaba使用道具回复
+// id:351
+message sc_airlaba_use_item_reply {
+  required cs_airlaba_use_item_req req = 1;
+  required bool success = 2;    // 成功true，否则失败
+  required uint32 left_num = 3; // 剩余物品数量
+}
+
+// des: airlaba 破产补助请求
+// id:352
+message cs_airlaba_impov_sub_req {
+  required uint32 type =
+      1; // 破产补助请求类型 1--是否可以进入破产补助场景，2--破产补助奖励请求
+}
+
+// des: airlaba 破产补助请求回复
+// id:353
+message sc_airlaba_impov_sub_reply {
+  required uint32 code = 1;            // 0 成功否则失败
+  required uint32 reward_item_id = 2;  // 奖励的物品 id
+  required uint32 reward_item_num = 3; // 奖励的物品数量
+}

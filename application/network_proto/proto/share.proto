@@ -1,0 +1,178 @@
+// -------------------------
+// "分享"相关协议
+// -------------------------
+
+package network;
+import "item.proto";
+
+// des:分享新手礼包领取
+// id:266
+message cs_share_new_bee_reward_req{
+	required string code = 1;  //邀请码
+}
+
+// des:分享新手礼包领取返回
+// id:267
+message sc_share_new_bee_reward_reply{
+	required uint32 result = 1;      // 0成功,1失败
+	optional bytes err = 2;     // 错误码
+	repeated pb_reward_info rewards = 3;  //奖励
+}
+
+
+// des:分享任务奖励领取
+// id:268
+message cs_share_mission_reward_req{
+	required string friend_id = 1;	// 好友编号
+	required int32 type = 2;		// 任务类型
+}
+
+// des:分享任务奖励领取返回
+// id:269
+message sc_share_mission_reward_reply{
+	required uint32 result = 1;      // 0成功,1失败
+	optional bytes err = 2;     // 错误码
+	repeated pb_reward_info rewards = 3;  //奖励
+	required string friend_id = 4;	// 好友编号
+	required int32 type = 5;		// 任务类型
+}
+
+// des:分享信息子项
+message pb_share_mission {
+
+	required string friend_id = 1;	// 好友编号
+	required bytes name = 2;		// 玩家名称
+	required string head = 3;		// 头像
+	required int32 vip_lv = 4;		// vip等级
+	required string title = 5;		// 称号
+	required int32 type = 6;		// 任务类型
+	required int32 status = 7;		// 1 完成 2已领
+}
+
+// des:分享信息
+// id:270
+message sc_share_info{
+	required string my_code = 1;					// 我的分享码8位数字
+	required string code = 2;				// 分享给我的邀请码
+	required bool free = 3;					//
+	required int32 count = 4;					// 分享好友数
+	repeated pb_share_mission list = 5;	// 任务列表
+}
+
+// des:分享任务更新
+// id:271
+message sc_share_mission_update{
+	repeated pb_share_mission list = 1;  // 任务列表
+	required int32 count = 2;   //好友数
+}
+
+// des:分享抽奖
+// id:272
+message cs_share_draw_request{
+	required int32 flag = 1;	// 1 一日抽; 2 三日抽; 3 七日抽
+}
+
+// des:分享好友进度
+// id:273
+message cs_share_friend_request{
+	required int32 page = 1;	// 页数
+	optional string user_id = 2;	// 查指定好友(页数参数设置为0时有效)
+}
+
+// des:分享好友榜单
+// id:274
+message cs_share_rank_request{
+	required int32 page = 1;	// 页数
+}
+
+// des:分享抽奖返回
+// id:275
+message sc_share_draw_response {
+	required uint32 result = 1;          // 0成功,1失败
+	optional bytes err = 2;              // 错误码
+	required int32 index = 3;	 	// 奖励下标(从 1 开始)
+}
+
+// des:分享好友进度子项
+message pb_share_history_item_response{
+	required string name = 1;	 	// 内容
+	required int32 process = 2;	 	// 时间
+}
+
+// des:分享好友进度子项
+message pb_share_history_friend_item_response{
+	required string userId = 1;	 		// 游戏id
+	required bytes name = 2;	 		// 名称
+	required int32 create_time = 3;	 	// 注册时间
+	required int32 first_day = 4;	 	// 第一天福利(0 未领, 1, 已领取)
+	required int32 three_day = 5;	 	// 第三天福利(0 未领, 1, 已领取)
+	required int32 seven_day = 6;	 	// 第七天福利(0 未领, 1, 已领取)
+	required int32 is_red = 7;	 		// 是否兑换过红包(0 否, 1是)
+}
+
+// des:分享好友进度
+// id:276
+message sc_share_history_response{
+	required int32 count = 1;			// 我的分享数量
+	required int32 one_draw = 2;			// 1日抽奖次数
+	required int32 three_draw = 3;		// 3日抽奖次数
+	required int32 seven_draw = 4;		// 7日抽奖次数
+	required int32 pages = 5;			// 总页数
+	repeated pb_share_history_friend_item_response list = 6;	 	// 列表
+}
+
+// des:分享好友榜单子项
+message pb_share_rank_item_response{
+	required int32 rank = 1;	 		// 排名
+	required bytes name = 2;	 		// 名称
+	required int32 count = 3;	 		// 有效次数
+}
+
+// des:分享好友榜单
+// id:277
+message sc_share_rank_response{
+	required int32 count = 1;		// 我的分享数量
+	required int32 rank = 2;		// 我的排名
+	required int32 pages = 3;		// 总页数
+	repeated pb_share_rank_item_response list = 4;	 	// 列表
+	optional int32 beginTime = 5;	// 开始时间
+	optional int32 endTime = 6;		// 结束时间
+}
+
+// des:分享抽奖剩余次数
+// id:278
+message sc_draw_count_response{
+	required int32 draw_count  = 1;		// 3日
+	required int32 draw_count_seven  = 2;		// 7日
+	required int32 draw_count_one = 3;		// 1日
+}
+
+// des:7日狂欢任务信息
+// id:310
+message sc_task_seven_info_response{
+	required int32 task_id = 1;	// 任务编号
+	required int32 process = 2;	// 完成度
+	optional int32 status = 3;	// 状态(0,进行中,1完成,2结束(奖励已领))
+	optional int32 award = 4;	// (1 今日领过)
+}
+
+// des:7日狂欢领奖
+// id:311
+message cs_task_seven_award_request{
+
+}
+
+// des:7日狂欢领奖返回
+// id:312
+message sc_task_seven_award_response{
+	required uint32 result = 1;          // 0成功,1失败
+	optional bytes err = 2;              // 错误码
+	repeated pb_reward_info rewards = 3;  //奖励
+}
+
+// des:分享朋友圈
+// id:313
+message cs_share_with_friends_req{
+
+}
+

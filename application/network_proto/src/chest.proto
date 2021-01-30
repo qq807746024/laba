@@ -1,0 +1,38 @@
+// -------------------------
+// "对局宝箱"相关协议
+// -------------------------
+
+package network;
+import "item.proto";
+
+// des:领取对局宝箱
+// id:142
+message cs_player_niu_room_chest_draw{
+	required uint32 type = 1;  //领取宝箱类型
+	required int32 game_type = 2; // 游戏类型 1- 牛牛，2 -百人，3 - 拉霸
+}
+
+// des:领取宝箱返回
+// id:143
+message sc_niu_room_chest_draw_reply{
+	required uint32 result = 1;      // 0成功,1失败
+	optional bytes err = 2;     // 错误码
+	repeated pb_reward_info rewards = 3;  //签到奖励
+	required int32 game_type = 4; // 游戏类型 1- 牛牛，2 -百人，3 - 拉霸
+}
+
+// des:对局信息更新
+// id:144
+message sc_niu_room_chest_info_update{
+	required uint32 times = 1;  //对局次数
+	required int32 game_type = 2; // 游戏类型 1- 牛牛，2 -百人，3 - 拉霸
+}
+
+// des:对局领取免费钻石次数
+// id:148
+message sc_niu_room_chest_times_update{
+	required uint32 times_niu = 1;  //领取对局次数
+	required uint32 times_hundred = 2;  //领取对局次数
+	required uint32 times_laba = 3;  //领取对局次数
+	required int32 update_type = 4; // 0 - 全更新， 1- 牛牛，2 -百人，3 - 拉霸
+}

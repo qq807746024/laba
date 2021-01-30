@@ -1,0 +1,168 @@
+package network;
+import "item.proto";
+
+// des:房间状态同步 接收到时开始倒计时
+// id:401
+message sc_doudizhu_room_state_update{
+    required uint32 state_id = 1;                               // 进入的状态id (1匹配阶段 2抢地主阶段 3游戏阶段 4结算阶段)
+    optional pb_auto_list auto_list = 2;                        // id = 2/3  托管标志
+    optional uint32 basescore = 3;                              // id = 2/3  底分
+    optional uint32 multiples = 4;                              // id = 2/3  叫分倍数
+    optional pb_doudizhu_card_list my_card_list = 5;            // id = 2/3  手牌数据
+    optional pb_doudizhu_hand_num_list hand_num_list = 6;       // id = 3    三家手牌数量
+    optional pb_doudizhu_card_list remain_card_list = 7;        // id = 3    底牌数据
+    optional pb_doudizhu_calc_card_list calc_card_list = 8;     // id = 3    记牌器数据
+    optional uint32 dizhu_pos = 9;                              // id = 3    地主位置
+    optional pb_doudizhu_settlement settlement = 10;            // id = 4    结算数据
+    optional pb_doudizhu_last_cards_list last_cards_list = 11;  // id = 4    结算时段明牌
+}
+
+// des:玩家进入或返回房间
+// id:402
+message cs_doudizhu_enter_req{
+    required uint32 level = 1;                              // 房间类型(1,2,3)
+}
+
+// des:玩家进入或返回房间返回
+// id:403
+message sc_doudizhu_enter_reply{
+    required uint32 result = 1;                             // 返回码（0成功 1入场金币不足 2正在其他房间 3进出游戏房间过于频繁）
+    required uint32 my_pos = 2;                             // 我的位置
+}
+
+// des:新加入的玩家信息更新
+// id:404
+message sc_doudizhu_player_update{
+    repeated pb_doudizhu_player_info player_list = 1;
+}
+
+// des:抢地主选倍率
+// id:405
+message cs_doudizhu_bet_req{
+    required uint32 rate = 1;                                // 倍率
+}
+
+// des:抢地主选倍率返回
+// id:406
+message sc_doudizhu_bet_reply{
+    required uint32 result = 1;                             // 0 成功
+    optional bytes err = 2;                                 // 错误信息
+}
+
+// des:抢地主选倍率信息更新
+// id:407
+message sc_doudizhu_bet_update{
+    required uint32 pos = 1;
+    required uint32 rate = 2;
+}
+
+// des:玩家离开房间(  发完该消息后切勿在发送在玩同步消息  )
+// id:408
+message cs_doudizhu_leave_req{
+}
+
+// des:玩家离开返回
+// id:409
+message sc_doudizhu_leave_reply{
+    required uint32 result = 1;                             // 0成功
+}
+
+// des:离开玩家位置更新
+// id:410
+message sc_doudizhu_leave_update{
+    required uint32 pos = 1;
+}
+
+// des:出牌
+// id:411
+message cs_doudizhu_play_card_req{
+    repeated pb_doudizhu_card_list card_list = 1;           // 出的牌(记录为0时代表pass)
+}
+
+// des:出牌返回
+// id:412
+message sc_doudizhu_play_card_reply{
+    required uint32 result = 1;                             // 0成功
+}
+
+// des:出牌更新
+// id:413
+message sc_doudizhu_play_card_update{
+    required uint32 pos = 1;                                // 玩家位置
+    repeated pb_doudizhu_card_list card_list = 2;           // 出的牌(记录为0时代表pass)
+}
+
+// des:查询玩家是否在玩斗地主
+// id:414
+message cs_doudizhu_query_gaming_req{
+}
+
+// des:查询玩家是否在玩斗地主返回
+// id:415
+message sc_doudizhu_query_gaming_reply{
+    required uint32 level = 1;                               // 0-不在玩 >0所在房间类型
+}
+
+////////////////////////////////
+// des: 结算时段明牌信息
+message pb_doudizhu_last_cards_list {
+    repeated pb_doudizhu_card_list = 1;                     // 三家牌列表
+}
+
+// des: 牌列表
+message pb_doudizhu_card_list{
+    repeated pb_doudizhu_card cards = 1;
+}
+
+// des: 单张牌
+message pb_doudizhu_card{
+    required uint32 number = 1;                             // 1-15 (1-11表示3-K,12表示A,13表示2,14表示小王,15表示大王)
+    required uint32 color = 2;                              // 4黑桃 3红桃 2梅花 1方块
+}
+
+// des: 记牌器信息
+message pb_doudizhu_calc_card_list{
+    repeated pb_doudizhu_calc_card cards = 1;
+}
+
+// des: 记牌器单个信息
+message pb_doudizhu_calc_card{
+    required uint32 number = 1;                             // 1-15 (1-11表示3-K,12表示A,13表示2,14表示小王,15表示大王)
+    required uint32 remaind = 2;                            // 剩余数量
+}
+
+// des: 手牌数量信息
+message pb_doudizhu_hand_num_list{
+    repeated uint32 number = 1;                             // 三家手中牌的数量
+}
+
+// des: 托管标志列表
+message pb_auto_list{
+    repeated bool auto = 1;                                 // 三家托管情况
+}
+
+// des: 结算信息
+message pb_doudizhu_settlement{
+    repeated pb_special_card special = 1;                   // 特殊牌型
+    required uint32 basescore = 2;                          // 底分
+    required uint32 multiples = 3;                          // 叫分倍数
+    required uint32 identity = 4;                           // 身份 (0农民 1地主)
+    required uint32 reward = 5;                             // 奖励 (胜利失败可由此判断)
+}
+
+message pb_special_card{
+    required uint32 type = 1;                               // 特殊牌型类型（1火箭 2炸弹 3春天）
+    required uint32 multiples = 2;                          // 倍数
+}
+
+// des:玩家信息结构
+message pb_doudizhu_player_info{
+    required uint32 pos = 1;
+    required string player_uuid = 2;
+    required uint64 gold_num = 3;
+    required uint32 icon_type = 4;
+    optional string icon_url = 5;
+    optional bytes player_name = 6;
+    required uint32 vip_level = 7;
+    required uint32 sex = 8;                                // 性别（0男 1女）
+}

@@ -1,0 +1,245 @@
+// -------------------------
+// "豪车"相关协议
+// -------------------------
+
+package network;
+import "item.proto";
+
+// des:进入豪车
+// id:280
+message cs_car_enter_req {
+  required int32 test_type = 1; // 房间类型：0 不分场, 1 试玩，2 娱乐
+}
+
+// des:进入豪车返回
+// id:281
+message sc_car_enter_reply {
+  required uint32 result = 1; // 0成功,1失败
+  optional bytes err = 2;     // 错误码
+}
+
+// des:离开豪车
+// id:282
+message cs_car_exit_req {}
+
+// des:离开豪车返回
+// id:283
+message sc_car_exit_reply {
+  required uint32 result = 1; // 0成功,1失败
+  optional bytes err = 2;     // 错误码
+}
+
+// des:排庄
+// id:284
+message cs_car_master_req {
+  required int32 flag = 1;  // (1 上庄 2 下庄)
+  required int32 money = 2; // 上庄金额
+}
+
+// des:排庄返回
+// id:285
+message sc_car_master_reply {
+  required uint32 result = 1; // 0成功,1失败
+  optional bytes err = 2;     // 错误码
+  required int32 flag = 3; // 是否自己(1 是, 2 自己排庄中,3可取消)
+}
+
+// des:下注
+// id:286
+message cs_car_bet_req {
+  required int32 index = 1; // 标识
+  required int32 money = 2; // 金币数
+}
+
+// des:下注返回
+// id:287
+message sc_car_bet_reply {
+
+  required uint32 result = 1; // 0成功,1失败
+  optional bytes err = 2;     // 错误码
+  required int32 index = 3;   // 标识
+  required int32 money = 4;   // 金币数
+  required int32 self = 5;    // 0别人下注广播, 1 自己下注返回
+}
+
+// des:续压
+// id:288
+message cs_car_rebet_req {
+  repeated cs_car_bet_req list = 1; // 续压
+}
+
+// des:续压返回
+// id:289
+message sc_car_rebet_reply {
+
+  required uint32 result = 1;         // 0成功,1失败
+  optional bytes err = 2;             // 错误码
+  repeated sc_car_bet_reply list = 3; // 列表
+}
+
+// des:排庄列表
+// id:290
+message cs_car_master_list_req {
+
+  required int32 flag = 1; //标识
+}
+
+// des:排庄子项
+message pb_car_master_item {
+  required bytes name = 1;  // 名称
+  required int32 money = 2; // 钱
+  required int32 vip = 3;   // vip等级
+}
+
+// des:在线列表
+// id:291
+message cs_car_user_list_req {}
+
+// des:在线列表返回
+// id:292
+message sc_car_user_list_reply {
+  required int32 flag = 1;            // 标记1起始,2中间,3结尾
+  repeated pb_car_user_item list = 2; // 历史
+}
+
+// des:用户列表历史子项
+message pb_car_user_item {
+  required bytes name = 1;  // 名称
+  required int32 money = 2; // 金币
+  required int32 vip = 3;   // vip 等级
+  required string head = 4; // 头像
+  required int32 sex = 5;   //性别
+}
+
+// des:开奖结果历史
+// id:294
+message sc_car_result_history_req {
+
+  repeated pb_car_result_history_item list = 1; // 历史
+}
+
+// des:开奖结果历史
+message pb_car_result_history_item {
+  required string open_index = 1; // 期数
+  required int32 result = 2;      // 结果
+  required int32 pool = 3;        // 奖池(1 是)
+}
+
+// des:排庄列表
+// id:295
+message sc_car_master_wait_list_reply {
+
+  required int32 flag = 1;              // 标识
+  repeated pb_car_master_item list = 2; // 排庄列表
+}
+// des:庄家信息
+// id:296
+message sc_car_master_info_reply {
+
+  required int32 self = 1;  // 是否自己(1 是, 2 自己排庄中)
+  required bytes name = 2;  // 名称
+  required int32 money = 3; // 钱
+  required int32 score = 4; // 分数
+  required int32 count = 5; // 做庄次数
+  required string head = 6; // 头像
+  required int32 vip = 7;   // vip
+  required int32 sex = 8;   //性别
+}
+
+// des:盘面状态
+// id:297
+message sc_car_status_reply {
+  required int32 status = 1; // 状态
+  required int32 time = 2;   // 剩余秒数
+}
+
+// des:房间下注子项
+message pb_car_bet_item {
+  required int32 index = 1; // 标识
+  required int32 money = 2; // 金币数
+}
+
+// des:房间信息
+// id:298
+message sc_car_room_info_reply {
+
+  required sc_car_master_info_reply masterInfo = 1; // 庄家信息
+  repeated pb_car_bet_item list = 2;                // 总下注列表
+  repeated pb_car_bet_item listSelf = 3;            // 自己下注列表
+  required int32 result = 4;                        // 结果
+  required int32 self_num = 5;                      // 个人输赢
+  required int32 master_num = 6;                    // 庄家输赢
+  required int32 pool_sub = 7;                      // 彩池总扣
+  required int32 pool = 8;                          // 彩池个人
+  optional int32 bet_limit = 9;                     // 条件(金币数)
+}
+
+// des:提示信息
+// id:299
+message sc_car_hint_reply {
+  required bytes msg = 1; // 内容
+}
+
+// des:开奖结果
+// id:300
+message sc_car_result_reply {
+  required int32 result = 1;      // 结果
+  required int32 resultIndex = 2; // 结果下标
+  required int32 selfNum = 3;     // 个人输赢
+  required int32 masterNum = 4;   // 庄家输赢
+  required int32 poolSub = 5;     // 彩池总扣
+  required int32 pool = 6;        // 彩池个人
+}
+
+// des:奖池总额
+// id:301
+message sc_car_pool_reply {
+  required int32 result = 1;      // 奖池总额
+  required int32 rank_result = 2; // 排行榜奖池
+}
+
+// des:加钱
+// id:303
+message cs_car_add_money_req {
+  required int32 money = 1; // 金币数
+}
+
+// des:加钱返回
+// id:304
+message sc_car_add_money_reply {
+  required uint32 result = 1; // 0成功,1失败
+  optional bytes err = 2;     // 错误码
+}
+
+// des:玩家在玩豪车状态通知消息 无返回
+// id:305
+message cs_car_syn_in_game_state_req {}
+
+// des:玩家信息结构
+message pb_car_niu_player_info {
+  required string player_uuid = 1;
+  required uint32 icon_type = 2;
+  optional string icon_url = 3;
+  optional bytes player_name = 4; // 非庄家时为空
+  required uint32 vip_level = 5;
+  optional uint64 gold = 6;          // 金币 查询列表时为空
+  optional uint32 pos = 7;           //位置信息 查询列表时为空
+  optional uint64 pool_win_gold = 8; // 奖池分钱数
+  required uint32 sex = 9;           // 性别 1男2女
+}
+
+// des: 豪车奖池中奖返回列表元素
+message pb_car_query_pool_win_player_reply_list_elem {
+  required uint64 date = 1;                 // 中奖时间
+  repeated pb_car_niu_player_info list = 2; // 玩家列表
+}
+
+// des:查询上次分奖池钱最多的人返回
+// id:122
+message sc_car_query_pool_win_player_reply {
+  repeated pb_car_query_pool_win_player_reply_list_elem list = 1;
+}
+
+// des:请求查询豪车排行榜
+// id:332
+message cs_car_query_pool_win_player_req {}

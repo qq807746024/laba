@@ -1,0 +1,142 @@
+// 奖品兑换
+package network;
+import "item.proto";
+
+// des:奖品兑换更新 登入时发
+// id:230
+message sc_prize_config_update{
+    repeated pb_prize_info list = 1;    // 配置列表
+}
+
+// des:奖品信息结构
+message pb_prize_info{
+    required uint32 obj_id = 1;     //id
+    required bytes name = 2;    //物品名字
+    required uint32 need_item_id = 3;   // 目前都是钞票
+    required uint64 need_item_num = 4;      //需求数量
+    required uint32 need_vip_level = 5;     //需求vip
+    required string icon = 6;     //图标
+    required uint32 tag = 7;   //标签
+    required uint32 cls = 8;   //分类 1话费 2金币红包 3实物
+    required bytes dsc = 9;   //描述
+    required uint32 today_buy_times = 10;   // 当天已买次数
+    required int32 sort_id = 11; //排序id
+    required uint32 special_left_times = 12; // 非 vip 领取剩下的次数
+}
+
+// des:查询物品库存
+// id:231
+message cs_prize_query_one_req{
+    required uint32 obj_id = 1;     //id
+}
+
+// des:查询物品库存 返回
+// id:232
+message sc_prize_query_one_reply {
+    required uint32 obj_id = 1;     //id
+    required uint32 day_times_config = 2;   //每日可兑换次数
+    required uint32 today_exchange_times = 3;   //今天已兑换次数
+    required uint32 store_num = 4;      //库存量
+    required uint32 crad_num = 5;   // 电话卡数量 其他物品没用
+    required uint32 special_left_times = 6; // 非 vip 领取剩下的次数
+    required uint32 need_vip_level = 7; //需求vip
+}
+
+// des:兑换
+// id:233
+message cs_prize_exchange_req{
+    required uint32 obj_id = 1;     //id
+    optional uint32 phone_card_charge_type = 2;     //换话费卡时使用 1=直冲 2=提取卡密
+    optional string phone_number = 3;     //直充时使用 电话号
+    optional uint32 address_id = 4;     // 实物兑换时地址id
+}
+
+// des:兑换返回 ( 同时发查询物品库存返回)
+// id:234
+message sc_prize_exchange_reply{
+    required uint32 result = 1;     //0 成功
+    required bytes err = 2;     //错误信息
+    repeated pb_reward_info reward = 3;
+    required uint32 obj_id = 4;     //id
+}
+
+
+// des:兑换记录 登入和更新时发送
+// id:235
+message sc_prize_exchange_record_update{
+    repeated pb_prize_exchange_record list = 1; //
+}
+
+// des:信息结构
+message pb_prize_exchange_record{
+    required string id = 1;     // id 客户端判断id是否存在 不存在添加 存在则修改
+    required uint32 record_type = 2;     //1卡 2金币红包 3实物
+    required uint32 obj_id = 3;     //物品id
+    required uint32 need_item_id = 4;   // 目前都是钞票
+    required uint64 need_item_num = 5;      //需求数量
+    required uint32 second_time = 6;   // 时间戳
+
+    optional uint32 recharge_type = 7;   // 电话卡充值类型 1=直充 2=卡密
+    optional uint32 recharge_state = 8;   // 电话卡充值状态 0=等待充值 1=充值成功(卡密类型时表示有卡密数据了)
+    optional string card_number = 9;   // 卡号
+    optional string card_psd = 10;   // 卡密
+}
+
+// des:地址更新 登入时和改变时发送
+// id:236
+message sc_prize_address_info_update{
+    repeated pb_prize_address_info list = 1;
+}
+
+// des:收货信息结构
+message pb_prize_address_info{
+    required uint32 id = 1;     // 地址id
+    required bytes name = 2;     //收货人名字
+    required uint32 sex = 3;     // 1男 2女
+    required bytes province_name = 4;   // 省份
+    required bytes city_name = 5;   // 市名
+    required bytes address = 6;   // 详细地址
+    required bytes phone_number = 7;   // 电话
+}
+
+// des:地址修改
+// id:237
+message cs_prize_address_change_req{
+    required pb_prize_address_info new_info = 1;     //新地址数据
+}
+
+// des:地址修改返回
+// id:238
+message sc_prize_address_change_reply{
+    required uint32 result = 1;     //0 成功
+    required bytes err = 2;     //错误信息
+}
+
+// des:同步实物库存 红点
+// id:239
+message sc_prize_storage_red_point_update{
+    repeated pb_prize_query_one list = 1;
+}
+
+// des:查询物品信息结构
+message pb_prize_query_one{
+    required uint32 obj_id = 1;     //id
+    required uint32 store_num = 2;      //库存量
+    required uint32 crad_num = 3;   // 电话卡数量 其他物品没用
+}
+
+// des:查询卡密
+// id:255
+message cs_prize_query_phonecard_key_req{
+    required string rec_id = 1;     // 订单id( 记录id )
+}
+
+// des:查询卡密返回
+// id:256
+message sc_prize_query_phonecard_key_reply{
+    required uint32 result = 1;     //0 成功 1失败
+    required bytes err = 2;     //错误信息
+
+    required uint32 state = 3;     // 0卡密已发出 1订单审核中
+    required string key = 4;   // 卡密
+}

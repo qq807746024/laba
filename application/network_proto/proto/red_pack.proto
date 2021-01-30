@@ -1,0 +1,132 @@
+// 红包系统
+
+package network;
+
+
+// des:查询红包列表
+// id:220
+message cs_red_pack_query_list_req{
+    required uint32 begin_id = 1;   //头id
+    required uint32 end_id = 2;     //尾id
+}
+
+// des:查询红包列表返回
+// id:221
+message sc_red_pack_query_list_reply{
+    required uint32 begin_id = 1;   //当前列表头id
+    required uint32 end_id = 2;     //当前列表尾id
+    required uint32 max_num = 3;     //最大长度
+    repeated pb_red_pack_info list = 4;
+}
+
+message pb_red_pack_info{
+    required string uid = 1;
+    required bytes player_name = 2;     // 名字
+    required bytes player_icon = 3;     // 头像
+    required string player_id = 4;  //创建红包的玩家id
+    required uint64 min_num = 5;    //最小值
+    required uint64 max_num = 6;    //最大值
+    required uint32 over_time = 7;  //结束时间
+    required bytes des = 8;  //描述
+    required string account = 9;    //玩家号
+    required uint32 sex = 10;   // 性别
+}
+
+// des:拆红包
+// id:222
+message cs_red_pack_open_req{
+    required string uid = 1;    //id
+    required uint64 check_num = 2;  //猜值
+}
+
+// des:拆红包返回
+// id:223
+message sc_red_pack_open_reply{
+    required uint32 result = 1; //0成功
+    required bytes err = 2;
+    required uint64 reward_num = 3;    //奖励
+    required string uid = 4;    //id
+}
+
+// des:发红包
+// id:224
+message cs_red_pack_create_req{
+    required uint64 set_num = 1;  //设值
+    required bytes des = 2;  //描述
+}
+
+// des:发红包返回
+// id:225
+message sc_red_pack_create_reply{
+    required uint32 result = 1; //0成功
+    required bytes err = 2;
+}
+
+// des:红包通知
+// id:226
+message sc_red_pack_notice_update{
+    repeated pb_red_pack_notice list = 1;
+    repeated string delete_notice_list = 2;     // 需清除的id列表
+}
+// des:单条红包通知
+message pb_red_pack_notice{
+    required string notice_id = 1;         //通知id
+
+    required uint32 notice_type = 2;    //1红包状态信息 2玩家猜中选择(类型2时只有content和notice_id值有效)
+    required uint32 get_sec_time = 3; //时间
+    required bytes content = 4; //描述内容
+    required uint64 gold_num = 5; //红包内金额
+    required uint32 type = 6;    //1 未开启 2 已开启 3 已取消
+    required bytes open_player_name = 7; //开启红包的玩家的名字
+    required string open_player_account = 8; //开启红包的玩家号
+    required string uid = 9;         //红包id
+}
+// des:取消红包
+// id:227
+message cs_red_pack_cancel_req{
+    required string uid = 1;
+}
+// des:取消红包返回
+// id:228
+message sc_red_pack_cancel_reply{
+    required uint32 result = 1; //0成功
+    required bytes err = 2;
+    required string uid = 3;         //红包id
+}
+// des:总红包数，玩家自己发的红包的红包信息
+// id:229
+message sc_self_red_pack_info{
+	required uint32 all_red_pack_num = 1;   //总红包数
+	repeated pb_red_pack_info red_pack_list = 2;  //自己的红包
+}
+
+// des:红包确认请求
+// id:260
+message cs_red_pack_do_select_req{
+    required string notice_id = 1;         //通知id
+    required uint32 opt = 2;     				// 0同意 1拒绝
+}
+
+// des:红包确认返回
+// id:261
+message sc_red_pack_do_select_reply
+{
+    required uint32 result = 1;     				// 0成功 非0失败
+    optional bytes	err_msg = 2;    				// 失败的提示信息
+    required string redpack_id = 3;         // 红包id
+    required uint32 opt = 4;     				// 0同意 1拒绝
+    required string notice_id = 5;         //通知id
+}
+
+// des:红包查询请求
+// id:262
+message cs_red_pack_search_req{
+    required string uid = 1;         //通知id
+}
+
+// des:红包查询返回
+// id:263
+message sc_red_pack_search_reply
+{
+    repeated pb_red_pack_info list = 1;     // 空则不存在
+}

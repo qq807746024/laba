@@ -1,0 +1,137 @@
+// -------------------------
+// "商店"相关协议
+// -------------------------
+
+package network;
+
+import "item.proto";
+
+// des:商店所有物品信息
+// id:80
+message sc_shop_all_item_base_config {
+	repeated pb_shop_item item_list = 1;
+}
+//des:商店物品结构
+message pb_shop_item {
+	required uint32 id = 1;                 //编号
+	required uint32 shop_type = 2;          //商城类型
+	required uint32 item_id = 3;            //物品id
+	required uint32 item_num = 4;           //物品数量
+	required uint32 item_extra_num = 5;     //额外获得数量
+	repeated pb_cost_type_and_num cost_list = 6;
+	required uint32 discount = 7;           //折扣
+	required uint32 special_flag = 8;       //1-特惠，2-热卖，3-限时(暂定)
+	required uint32 start_time = 9;         //出现时间
+	required uint32 end_time = 10;           //结束时间
+	required uint32 limit_times = 11;       //限制次数  99--没有次数限制的物品
+	required uint32 vip_limit = 12;          //vip限制
+	required uint32 left_times = 13;         //今日剩余购买次数 99--没有次数限制的物品
+	required string icon = 14;               //商店纹理
+	required bytes name = 15;               //商品名称
+	required uint32 sort = 16;               //排序
+}
+//des:消耗货币信息列表
+message pb_cost_type_and_num {
+	required uint32 cost_type = 1;      //消耗货币类型
+	required uint32 cost_num = 2;       //消耗货币数量
+}
+
+//des:商店购买
+//id:81
+message cs_shop_buy_query {
+	required uint32 id = 1;         //购买的物品编号
+}
+//des:商店购买返回
+//id:82
+message sc_shop_buy_reply {
+	required uint32 result = 1;         // 0成功 ,1失败
+	optional bytes err_msg = 2;         // 失败的提示信息
+	repeated pb_reward_info rewards = 3;
+	required uint32 left_times = 4;   //剩余次数  99--没有次数限制的物品
+	required uint32 id = 5;       // 编号
+}
+
+//des:金牛领奖信息 登入和领完奖时同步
+//id:83
+message sc_golden_bull_info_update{
+    required uint32 left_times = 1;         // 剩余可领奖次数
+}
+
+//des:金牛领奖
+//id:84
+message cs_golden_bull_draw_req{
+    required uint32 key = 1;    // 领奖id
+}
+
+//des:金牛领奖返回
+//id:85
+message sc_golden_bull_draw_reply{
+    required uint32 result = 1; //0成功
+    required bytes err = 2;
+}
+
+//des:月卡信息更新 登入 隔天 和 领奖返回时下发
+//id:86
+message sc_month_card_info_update{
+    required uint32 today_draw_flag = 1;         // 0=今日已领 1=可领 2=未购买
+    required uint32 left_times = 2;         // 剩余天数
+}
+
+//des:月卡领奖
+//id:87
+message cs_month_card_draw_req{
+}
+
+//des:月卡领奖返回
+//id:88
+message sc_month_card_draw_reply{
+    required uint32 result = 1; //0成功
+    required bytes err = 2;
+}
+
+//des:时段卡信息更新 登入 隔天 和 领奖返回时下发
+//id:86
+message sc_period_card_info_update{
+	required uint32 type = 1; // 0 -- 周卡
+    required uint32 today_draw_flag = 2; // 0=今日已领 1=可领 2=未购买
+    required uint32 left_times = 3; // 剩余天数
+}
+
+//des:时段卡领奖
+//id:87
+message cs_period_card_draw_req{
+	required uint32 type = 1;
+}
+
+//des:时段卡领奖返回
+//id:88
+message sc_period_card_draw_reply{
+	required uint32 type = 1;
+    required uint32 result = 2; //0成功
+    required bytes err = 3;
+}
+
+// des:奖券兑换
+// id:130
+message cs_cash_transformation_req{
+	required int32 num = 1; //
+}
+
+// des:奖券兑换返回
+// id:131
+message sc_cash_transformation_reply{
+	required uint32 result = 1; //0成功
+	required bytes err = 2;
+}
+
+// des:金牛任务进度
+// id:132
+message cs_golden_bull_mission{
+
+}
+
+// des:
+// id:133
+message sc_golden_bull_mission{
+	required int32 process = 1; //
+}

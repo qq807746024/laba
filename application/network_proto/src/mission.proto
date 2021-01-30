@@ -1,0 +1,149 @@
+// -------------------------
+// "任务"相关协议
+// -------------------------
+
+package network;
+
+import "item.proto";
+
+// des:领取任务奖励
+// id:110
+message cs_draw_mission_request{
+	required    uint32  id = 1;
+}
+
+// des:领取任务奖励返回
+// id:111
+message sc_draw_mission_result_reply
+{
+	required uint32 result = 1;     				// 0成功 非0失败
+	optional bytes err_msg = 2;    				// 失败的提示信息
+	repeated pb_reward_info reward_info_s   =   3;
+}
+
+// des:更新任务信息,登入时发送
+// id:112
+message sc_mission{
+	repeated pb_mission missions = 1;
+}
+
+// des:更新单条任务
+// id:113
+message sc_mission_update{
+	required pb_mission mission_ = 1;
+}
+
+// des:增加单条任务
+// id:114
+message sc_mission_add{
+	required pb_mission mission_ = 1;
+}
+
+// des:删除单条任务
+// id:115
+message sc_mission_del{
+	required uint32 id = 1;
+}
+// des:任务信息
+message pb_mission{
+	required uint32 id      = 1;        // 根据id判断日常,成就还是活动任务
+	required uint32 state   = 2;    // 0为接受，1为完成 2已领取
+	required uint64 count   = 3;	//  进度
+}
+
+// des:游戏中任务信息 百人和水果
+// id:208
+message sc_game_task_info_update
+{
+    repeated pb_game_task_info tast_info = 1;
+}
+
+message pb_game_task_info
+{
+    required int32 taskId = 1;		// 任务编号
+    optional int32 process = 2;		// 完成度
+    optional int32 status = 3;		// 状态(0,进行中,1完成,2结束(奖励已领))
+    optional int32 boxStart = 4;	// 1 表示开始
+    optional int32 boxProcess = 5;	// 完成度
+    repeated int32 boxStatus = 6;	// 状态数组(0,进行中,1完成,2结束(奖励已领))
+    optional int32 remaindTime = 7;	// 结束时间
+    required int32 tast_type = 8;	// 类型 1=百人 2=水果
+    required int32 vip_level = 9;	// vip等级
+}
+
+// des:游戏中累计任务信息更新
+// id:209
+message sc_game_task_box_info_update
+{
+    required uint32 game_type = 1;		// 任务编号
+    repeated uint32 box_flag_list = 2;   // 0=未完成 1可领 2已领
+}
+
+
+// des:任务奖励领取
+// id:210
+message cs_game_task_draw_req
+{
+    required uint32 game_type = 1;		// 任务编号
+    required uint32 task_id = 2;		// 任务编号
+}
+
+// des:任务奖励领取 返回
+// id:211
+message sc_game_task_draw_reply
+{
+    required uint32 result = 1; // 0成功 1失败
+    optional bytes err = 2; //错误
+    repeated pb_reward_info reward = 3; //奖励
+}
+
+// des:宝箱任务奖励领取
+// id:212
+message cs_game_task_box_draw_req
+{
+    required uint32 box = 1;		// 宝箱奖励索引(1,2,3)
+    required uint32 game_type = 2;		// 1 百人 2 拉霸
+}
+
+// des:宝箱任务奖励领取 返回
+// id:213
+message sc_game_task_box_draw_reply
+{
+    required uint32 result = 1; // 0成功 1失败
+    optional bytes err = 2; //错误
+    repeated pb_reward_info reward = 3; //奖励
+}
+
+// des:红包任务 领奖列表 进入房间 和 任务赢钱数变化时更新
+// id:214
+message sc_redpack_task_draw_list_update
+{
+    required uint32 upd_type = 1;		// 进入房间=1 钱变化=2
+    repeated pb_redpack_task_draw_info list = 2;
+}
+
+message pb_redpack_task_draw_info
+{
+    required uint32 game_type = 1;		//1 五人and百人 2 水果
+    required uint64 gold_num = 2;		// 总赢取的金币
+    repeated uint32 draw_list = 3;		// 领奖id    只有登入时下发 其他时候发空list
+}
+
+// des:红包任务奖励领取
+// id:215
+message cs_redpack_task_draw_req
+{
+    required uint32 game_type = 1;		//1 五人and百人 2 水果
+    required uint32 task_id = 2;		// id
+}
+
+// des:红包任务奖励领取 返回
+// id:216
+message sc_redpack_task_draw_reply
+{
+    required uint32 result = 1; // 0成功 1失败
+    optional bytes err = 2; //错误
+    repeated pb_reward_info reward = 3; //奖励
+    required uint32 game_type = 4;		//1 五人and百人 2 水果
+    required uint32 task_id = 5;		// id
+}

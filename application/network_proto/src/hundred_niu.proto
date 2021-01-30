@@ -1,0 +1,239 @@
+package network;
+import "niu_game.proto";
+
+// des:房间状态同步 接收到时开始倒计时
+// id:90
+message sc_hundred_niu_room_state_update{
+    //进入的状态id
+    // 4大阶段
+    //1.休息阶段:   10 休息
+    //2.下注阶段:  20 下注
+    //3.结算阶段:    30 结算
+    //4.奖池分钱阶段(偶尔出现):    40 奖池发奖
+    required uint32 state_id = 1;
+    required uint32 end_sec_time = 2;           //倒计时结束时间戳 (会提前停止倒计时)
+
+    repeated pb_one_player_poker_card last_card_info = 3;      //  id=30 5个位置牌数据
+    repeated hundred_game_over_settlement settle_list = 4;           //id = 30 结算数据
+    optional uint64 reward_pool_num = 5;           //id = 30 or 40 更新奖池数量
+    optional pb_hundred_win_rec last_win_rec = 6;           //id = 30 最新胜负记录
+    repeated pb_pool_reward_info pool_reward = 7;           //id = 40 奖池分钱信息 ()
+    optional uint32 master_continuous = 8;           //id = 20 庄家连庄次数
+    optional uint64 rank_reward_pool_num = 9;           //id = 30 or 40 更新排行榜奖池数量
+}
+
+// des:奖池分钱信息结构
+message pb_pool_reward_info{
+    required uint32 set_pos = 1;     // 1-4
+    required uint64 total_reward_num = 2;     // 奖励数量
+    repeated hundred_game_over_settlement seat_reward_num = 3;     // 每个位置分的钱数(set_pos_list不用)
+}
+
+// des:玩家结构
+message hundred_game_over_settlement{
+    required uint32 player_pos = 1;     // 0庄家 1 ->6 1到6座位 7列表中玩家
+    required int64 reward_num = 2;      // 输赢钱数
+    repeated uint32 set_pos_list = 3;      // 押注位置
+}
+
+// des:玩家结构
+message pb_one_player_poker_card{
+    required uint32 seat_pos = 1;     // 座位
+    repeated pb_poker_card card_list = 2;
+    required uint32 card_type = 3;
+    optional bool is_win = 4;   // true=赢庄家 2-5才有该数据
+}
+
+// des:玩家进入房间
+// id:91
+message cs_hundred_niu_enter_room_req{
+    required int32 test_type = 1; // 房间类型：1 试玩，2 娱乐
+}
+
+// des:玩家进入房间返回
+// id:92
+message sc_hundred_niu_enter_room_reply{
+    required uint32 result = 1;      // 0成功 1失败
+    optional bytes err = 2;     // 错误码
+    optional pb_hundred_niu_room_data game_data = 3;    // 当前房间数据
+
+}
+
+// des:房间数据结构
+message pb_hundred_niu_room_data{
+    required uint32 state_id = 1;
+    required uint32 end_sec_time = 2;           //倒计时结束时间戳
+
+    optional uint64 reward_pool_num = 3;           //奖池数量
+    repeated pb_set_chips_info my_set_chips_info = 4;        // 我的押注
+    // 总押注 走消息更新 sc_hundred_niu_free_set_chips_update
+    // 座位上人员信息 走消息更新 sc_hundred_niu_seat_player_info_update
+}
+
+// des:玩家查询闲家人员列表
+// id:93
+message cs_hundred_niu_player_list_query_req{
+    required uint32 type = 1;   // 0=7位置玩家列表 1=0-6玩家列表
+}
+
+// des:玩家查询闲家人员列表返回
+// id:94
+message sc_hundred_niu_player_list_query_reply{
+    required uint32 type = 1;
+    repeated pb_hundred_niu_player_info list = 2;
+}
+
+// des:玩家信息结构
+message pb_hundred_niu_player_info{
+    required string player_uuid = 1;
+    required uint32 icon_type = 2;
+    optional string icon_url = 3;
+    optional bytes player_name = 4;     // 非庄家时为空
+    required uint32 vip_level = 5;
+    optional uint64 gold = 6;   // 金币 查询列表时为空
+    optional uint32 pos = 7;   //位置信息 查询列表时为空
+    optional uint64 pool_win_gold = 8;   // 奖池分钱数
+    required uint32 sex = 9;   // 性别 1男2女
+}
+
+// des:闲家下注
+// id:95
+message cs_hundred_niu_free_set_chips_req{
+    required uint32 pos = 1;      // 1-4
+    required uint64 chips_num = 2;      // 筹码
+    required int32 test_type = 3; // 试玩场
+}
+
+// des:闲家下注返回
+// id:96
+message sc_hundred_niu_free_set_chips_reply{
+    required uint32 result = 1;      // 0成功
+    optional bytes err = 2;     // 错误信息
+    required uint32 pos = 3;      // pos
+    required uint64 total_chips_num = 4;      // 该位置我的总押注
+}
+
+// des:闲家下注更新
+// id:97
+message sc_hundred_niu_free_set_chips_update{
+    repeated pb_set_chips_info upd_list = 1;    // 押注信息列表
+    optional uint32 upd_flag = 2;       // 在下注状态进入房间时收到第一条该消息的 upd_flag = 1 其他时候收到为空
+}
+
+message pb_set_chips_info{
+    required uint32 pos = 1;    // 1- 4位置
+    required uint64 total_chips = 2;        // 总押注
+    repeated pb_seat_set_info seat_pos_list = 3;        // 押注者座位pos
+}
+
+message pb_seat_set_info{
+    required uint32 seat_pos = 1;    // 1- 7座位
+    required uint64 set_chips_num = 2;    // 该座位押注数
+}
+
+/////
+// des:上下座
+// id:98
+message cs_hundred_niu_sit_down_req{
+    required uint32 pos = 1;      // 1-6 位置 7下座
+}
+
+// des:上下座返回
+// id:99
+message sc_hundred_niu_sit_down_reply{
+    required uint32 result = 1;      // 0成功
+    optional bytes err = 2;     // 错误信息
+}
+
+// des:座位上人员信息 ( 包括庄家(pos=0)金币变化 ) 通过player_uuid比较得知位置上是否自己
+// id:100
+message sc_hundred_niu_seat_player_info_update{
+    repeated pb_hundred_niu_player_info seat_list = 1;  // 7=自己信息 0=庄家 1-6座位
+    optional uint32 delete_seat_pos = 2;      // 人员离开位置
+}
+
+///
+// des:上庄
+// id:101
+message cs_hundred_be_master_req{
+    required uint32 flag = 1;      // 0上 1下
+    required uint64 set_max = 2;      // 上庄设置最大数
+}
+
+// des:上庄返回
+// id:102
+message sc_hundred_be_master_reply{
+    required uint32 result = 1;      // 0成功
+    optional bytes err = 2;     // 错误信息
+}
+
+// des:获取上庄列表
+// id:103
+message cs_hundred_query_master_list_req{
+}
+
+
+// des:上庄列表更新
+// id:104
+message sc_hundred_query_master_list_reply{
+    repeated pb_hundred_niu_player_info list = 1;   // 庄家列表 主动更新
+}
+
+// des:同步在游戏中 (结算消息收到后立即发送)
+// id:105
+message cs_hundred_niu_in_game_syn_req{
+}
+
+// des:离开房间
+// id:106
+message cs_hundred_leave_room_req{
+}
+
+// des:离开房间返回
+// id:107
+message sc_hundred_leave_room_reply{
+    required uint32 result = 1;      // 0成功
+    optional bytes err = 2;     // 错误信息
+}
+
+// des:查询押注走势
+// id:108
+message cs_hundred_query_winning_rec_req{
+}
+
+// des:查询押注走势返回
+// id:109
+message sc_hundred_query_winning_rec_reply{
+    repeated pb_hundred_win_rec list = 1;
+}
+
+message pb_hundred_win_rec{
+    required bool win_1 = 1;      // true 胜
+    required bool win_2 = 2;      //
+    required bool win_3 = 3;      //
+    required bool win_4 = 4;      //
+    repeated uint32 pool_win = 5;       // 中奖池位置
+}
+
+// des:百人 自己金币变动更新 (在结算 奖池开奖 下注时 都主动发送)
+// id:120
+message sc_hundred_player_gold_change_update{
+    required int64 alter_num = 1;   // 变化值
+}
+
+// des:查询上次分奖池钱最多的人
+// id:121
+message cs_hundred_query_pool_win_player_req{
+}
+
+// des: 百人牛奖池中奖返回列表元素
+message pb_hundred_query_pool_win_player_reply_list_elem {
+    required uint64 date = 1; // 中奖时间
+    repeated pb_hundred_niu_player_info list = 2; // 玩家列表
+}
+
+// des:查询上次分奖池钱最多的人返回
+// id:122
+message sc_hundred_query_pool_win_player_reply{
+    repeated pb_hundred_query_pool_win_player_reply_list_elem list = 1;
+}

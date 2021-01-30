@@ -1,0 +1,538 @@
+// -------------------------
+// "玩家"相关协议
+// -------------------------
+
+package network;
+import "item.proto";
+
+// des:玩家信息
+// id:14
+message sc_player_base_info {
+  required string player_uuid = 1; // 玩家uuid
+  required string account = 2;     // 账号id
+  required bytes name = 3;         // 玩家昵称
+
+  required uint64 gold = 4;    // 金币
+  required uint32 diamond = 5; // 钻石
+  required uint32 cash = 6;    // 现金
+
+  required uint32 exp = 7;        // 玩家经验
+  required uint32 level = 8;      // 玩家等级
+  required string icon = 9;       // 玩家头像
+  required uint32 sex = 10;       // 性别 0男 1女
+  required uint32 vip_level = 11; // vip等级
+  required uint32 rmb = 12;       // 充值rmb
+
+  required int32 block = 13; //禁登
+}
+
+// des:修改名字
+// id:15
+message cs_player_change_name_req {
+  required bytes name = 1; // 玩家昵称
+}
+
+// des:修改名字返回
+// id:16
+message sc_player_change_name_reply {
+  required uint32 result = 1; // 返回结果 0成功 1名称已存在 2非法字符 3道具不足
+                              // 4名字不能为空 5名字超过8个字 6跟旧的相同
+}
+
+// des:修改头像
+// id:17
+message cs_player_change_headicon_req {
+  required string icon = 1; // 玩家头像
+  required uint32 sex = 2;  // 性别 0男 1女
+}
+
+// des:修改头像返回
+// id:18
+message sc_player_change_headicon_reply {
+  required uint32 result = 1; // 返回结果 0成功 1失败
+}
+
+// des:聊天
+// id:19
+message cs_player_chat {
+  required uint32 room_type = 1; // 频道：1=牛牛 2=百人
+  required uint32 content_type = 2; // 内容类型：0文字 1普通表情 2魔法表情
+  required bytes content = 3;          // 内容
+  required string obj_player_uuid = 4; // 目标玩家Id 目前置""
+}
+
+// des:聊天返回
+// id:20
+message sc_player_chat {
+  required uint32 room_type = 1; // 频道：1=牛牛 2=百人  3=豪车
+  required uint32 content_type =
+      2; // 内容类型：0文字 1普通表情 2魔法表情  豪车内容类型：(1 文本, 2 语音,3
+         // 表情,4进入游戏,5 弹幕)
+  required bytes content = 3;
+  required string player_uuid = 4;      // 说话玩家Id
+  required bytes player_name = 5;       // 说话玩家名称
+  required bytes player_icon = 6;       // 头像id
+  required uint32 player_vip = 7;       // vip等级
+  required uint32 player_seat_pos = 8;  // 座位
+  required uint32 send_time = 9;        // 发送时间
+                                        // 以下暂时没用
+  optional string des_player_uuid = 10; // 目标玩家Id
+  optional bytes des_player_name = 11;  // 目标玩家名称
+}
+
+// des:系统公告
+// id:21
+message sc_player_sys_notice {
+  required uint32 flag = 1;   // 类型：1走马灯
+  required bytes content = 2; // 内容
+}
+
+// des:服务端主动发给客户端的提示文字
+// id:22
+message sc_tips {
+  required uint32 type = 1; // 1字符提示,3秒后自动消失 2警告框提示
+  required bytes text = 2;
+}
+
+// des:查询玩家胜负记录
+// id:23
+message cs_query_player_winning_rec_req {
+  optional string obj_player_uuid = 1; // 查自己时不用发
+}
+
+// des:查询玩家胜负记录返回
+// id:24
+message sc_query_player_winning_rec_reply {
+  required uint32 win_rate = 1;       // 胜率
+  required uint32 win_count = 2;      // 胜次数
+  required uint32 defeated_count = 3; // 输次数
+  required int64 max_property = 4;    // 最高财富
+  required int64 total_profit = 5;    // 总盈利
+  required int64 week_profit = 6;     // 周盈利
+
+  required uint32 niu_10 = 7;           // 牛牛次数
+  required uint32 niu_11 = 8;           // 4炸次数
+  required uint32 niu_12 = 9;           // 五花牛
+  required uint32 niu_13 = 10;          // 五小牛
+  required uint32 niu_0_win = 11;       // 散牌获胜
+  optional string obj_player_uuid = 12; // 查自己时不用发
+  // 以下为别人时有发
+  optional bytes obj_name = 13;   // 名字
+  optional uint32 sex = 14;       // 性别 0男1女
+  optional uint64 gold = 15;      // 金币
+  optional string icon = 16;      // 头像
+  optional uint32 level = 17;     // 等级
+  optional uint32 vip_level = 18; // vip
+  optional string account = 19;   //玩家号
+}
+
+// des:请求获取在游戏中的人数
+// id:25
+message cs_niu_query_in_game_player_num_req {
+  required uint32 game_type = 1; // 1 牛牛 2百人 ........
+}
+
+// des:人数信息结构
+message pb_room_player_num {
+  required uint32 room_level = 1; // 1-6
+  required uint32 player_num = 2; // 人数
+}
+
+// des:请求获取在游戏中的人数返回
+// id:26
+message sc_niu_query_in_game_player_num_reply {
+  repeated pb_room_player_num list = 1;
+}
+
+// des:破产补助
+// id:69
+message cs_niu_subsidy_req {
+  required uint32 type = 1; // 1破产补助，2破产特别补助
+}
+
+// des:破产补助请求返回
+// id:70
+message sc_niu_subsidy_reply {
+  required uint32 result = 1; // 0成功,1失败
+  optional bytes err = 2;     // 错误码
+}
+
+// des:破产补助信息
+// id:71
+message sc_niu_subsidy_info_update {
+  required uint32 left_times = 1;   // 剩余次数
+  required uint32 subsidy_gold = 2; // 数量
+}
+// des:破产特别补助分享
+// id:73
+message cs_niu_special_subsidy_share {
+  required uint32 result = 1; // 0成功,1失败
+}
+// des:破产特别补助分享返回
+// id:74
+message sc_niu_special_subsidy_share {}
+// des:获取随机名字
+message cs_player_base_make_name {}
+
+// des:获取随机名字返回
+message sc_player_base_make_name_back {
+  required bytes name = 1; // 玩家昵称
+}
+
+// des:每日签到
+// id:75
+message cs_daily_checkin_req {
+  required uint32 flag = 1; //第几天
+}
+
+// des:每日签到  和 补签 返回
+// id:76
+message sc_daily_checkin_reply {
+  required uint32 result = 1;          // 0成功,1失败
+  optional bytes err = 2;              // 错误码
+  repeated pb_reward_info rewards = 3; //签到奖励
+  required uint32 flag = 4;            //第几天
+}
+
+// des:签到配置信息
+// id:77
+message sc_daily_checkin_info_update {
+  repeated pb_checkin_info list = 1;   //配置信息列表
+  required uint32 all_checkin_day = 2; //可以签多少天
+  required bool is_checkin_today = 3;  //今天是否签到
+  required bool vip_is_draw = 4;       // vip今天是否领取特别奖励
+}
+
+// des:一日的配置信息
+message pb_checkin_info {
+  required uint32 day = 1;             //第几天
+  repeated pb_reward_info rewards = 2; //签到奖励
+  required bool is_draw = 3;           //是否领取
+}
+// des:补签
+// id:78
+message cs_make_up_for_checkin_req {
+  required uint32 flag = 1; //第几天
+}
+
+// des:手机号信息更新
+// id:140
+message sc_player_phone_num_info_update {
+  required string phone_num = 1;
+  required bool is_draw = 2; //是否领取了修改电话号码的奖励
+}
+// des:绑定手机号返回
+// id:141
+message sc_player_bind_phone_num {
+  required uint32 result = 1; // 0成功,1失败
+}
+
+// des:绑定手机号领取奖励
+// id:145
+message cs_player_bind_phone_num_draw {}
+// des:绑定手机号领奖返回
+// id:146
+message sc_player_bind_phone_num_draw_reply {
+  required uint32 result = 1;          // 0成功,1失败
+  optional bytes err = 2;              // 错误码
+  repeated pb_reward_info rewards = 3; //奖励
+}
+// des:破产特别补助信息
+// id:147
+message sc_niu_special_subsidy_info_update {
+  required uint32 left_times = 1;   // 剩余次数
+  required uint32 subsidy_gold = 2; // 数量
+  required bool is_share = 3;       //是否分享过
+}
+
+// des:排行榜查询
+// id:123
+message cs_rank_query_req {
+  required uint32 rank_type = 1; // 1财富榜、2盈利榜、3钞票榜
+}
+
+// des:排行榜查询返回
+// id:124
+message sc_rank_qurey_reply {
+  required uint32 rank_type =
+      1; // 1财富榜、2盈利榜、3钞票榜 4百人单局 5百人累计
+  required uint32 my_rank = 2;              //  预留
+  repeated pb_rank_info rank_info_list = 3; // 排行信息
+  optional uint32 pool = 4;                 //奖池
+  optional uint32 my_recharge_money = 5;    //玩家本周充值
+  optional uint32 start_time = 6;           //开始时间
+  optional uint32 end_time = 7;             //结束时间
+}
+
+message pb_rank_info {
+  required uint32 rank = 1;         // 排名
+  required string player_uuid = 2;  // 玩家uuid
+  required bytes player_name = 3;   // 玩家名称
+  required string player_icon = 4;  // 玩家图标
+  required uint32 player_vip = 5;   // vip等级
+  optional uint64 gold_num = 6;     // 金币
+  optional uint64 win_gold_num = 7; // 赚金币
+  optional uint64 cash_num = 8;     // 钞票
+  optional uint32 sex = 9;          // 性别
+
+  optional uint64 hundred_win = 10; // 百人盈利 (只有百人排行榜有用)
+  required string account = 11;     //玩家号
+  optional uint64 redpack = 12;     // 红包
+}
+
+// des:领取VIP特别奖励
+// id:240
+message cs_vip_daily_reward {}
+// des:领取VIP特别奖励返回
+// id:241
+message sc_vip_daily_reward {
+  required uint32 result = 1;          // 0成功,1失败
+  optional bytes err = 2;              // 错误码
+  repeated pb_reward_info rewards = 3; //奖励
+}
+
+// des:新手引导 更新
+// id:150
+message sc_guide_info_update {
+  required uint32 step_id = 1; // 0未开始 1第一步完成 2第二步完成
+}
+
+// des:新手引导请求
+// id:151
+message cs_guide_next_step_req {
+  required uint32 next_step_id = 1; // 当前0 发1时进入下一步 发3时直接跳过新手
+}
+
+// des:新手引导请求返回 (主动发更新)
+// id:152
+message sc_guide_next_step_reply {
+  required uint32 result = 1;         // 返回结果：0成功
+  repeated pb_reward_info reward = 2; // 奖励
+}
+
+// des:百人上周中奖
+// id:153
+message cs_hundred_last_week_rank_query_req {}
+
+// des:百人上周中奖返回
+// id:154
+message sc_hundred_last_week_rank_query_reply {
+  repeated pb_hundred_last_week_data list = 1;
+}
+
+// des:百人上周中奖结构
+message pb_hundred_last_week_data {
+  required uint32 rank = 1;           // 排行
+  required uint64 reward_gold = 2;    // 奖励金币
+  required bytes name1_round_win = 3; // 单局
+  required bytes name2_total_win = 4; // 总
+}
+
+// des:实名制
+// id:155
+message cs_real_name_update {
+  required bytes name = 1;         //
+  required string id_card_num = 2; //
+}
+
+// des:实名制返回
+// id:156
+message sc_real_name_update {
+  required uint32 result = 1;          // 0成功,1失败
+  optional bytes err = 2;              // 错误码
+  repeated pb_reward_info rewards = 3; //奖励
+}
+
+// des:实名制查询
+// id:157
+message cs_real_name_req {}
+
+// des:实名制查询返回
+// id:158
+message sc_real_name_req {
+  required int32 type = 1; // 0 - 未认证，1- 已认证
+}
+
+// des:超级拉霸上周中奖名单
+// id:320
+message cs_super_laba_last_week_rank_query_req {}
+
+// des:超级拉霸上周中奖名单返回
+// id:321
+message sc_super_laba_last_week_rank_query_reply {
+  repeated pb_hundred_last_week_data list = 1;
+}
+
+// des：查询最近一期每日领奖榜单
+message cs_query_last_daily_rank_reward_req {
+  required int32 type = 1; // 0 -- profit 赚金
+}
+
+// des: 查询最近一期每日领奖榜单返回
+message sc_query_last_daily_rank_reward_reply {
+  required int32 type = 1;  // 0 -- profit 赚金 1 -- car 豪车
+  required uint64 date = 2; // 上期时间
+  repeated pb_rank_info rank_info_list = 3; // 榜单列表
+}
+
+// des: 玩家粘性红包的一个配置
+message pb_cur_stickiness_redpack_info {
+  required int32 room_type = 1;         // 房间类型
+  required int32 testtype = 2;          // 1 试玩，2 娱乐
+  required int32 level = 3;             // 当前等级
+  required int32 reward_type = 4;       // 待领取物品类型
+  required uint64 reward_amount = 5;    // 待领取的奖励数量
+  required uint64 reward_min = 6;       // 单次可领取最小值
+  required uint64 cur_total_amount = 7; // 当前等级的累计领取数量
+  required uint64 cur_trigger_next_amount = 8; // 当前触发下一级的奖励金额
+  required uint64 cur_earn_gold =
+      9; // 当前的累计赚金（由holding_earn_gold在任务时间内完成的数量累加而来）
+  required uint64 gold_cov_to_reward_item_rate = 10; // 金币换算成对应物品的比率
+  required uint64 holding_earn_gold = 11; // 当前任务时间内的赢取金币
+  required uint64 total_gold = 12; // 总获取的金币（包括未完成限时 时被废弃的）
+  required uint64 end_time = 13; // 余时间
+}
+
+// des: 玩家粘性红包状态更新（每次赢取金额时下发一次）
+message sc_player_stickiness_redpack_info_notify {
+  required pb_cur_stickiness_redpack_info cur_info = 1; // 当前状态
+}
+
+// des: 玩家领取粘性红包
+message cs_stickiness_redpack_draw_req {
+  required int32 room_type = 1; // 房间类型
+  required int32 testtype = 2;  // 1 试玩，2 娱乐
+}
+
+// des： 玩家领取粘性红包回复
+message sc_stickiness_redpack_draw_resp {
+  required pb_cur_stickiness_redpack_info cur_info = 1; // 当前的状态
+  required int32 reward_type = 2;    // 收到的物品的物品类型
+  required uint64 reward_amount = 3; // 收到的物品的数量
+}
+
+// des: 玩家粘性红包状态更新 手动请求（可用于进入房间或者打开界面更新）
+message cs_player_stickiness_redpack_info_notify_req {
+  required int32 room_type = 1; // 房间类型
+  required int32 testtype = 2;  // 1 试玩，2 娱乐
+}
+
+// des: 玩家可以领取的红包登等级列表元素
+message pb_player_bet_stickiness_redpack_list_elem {
+  required int32 level = 1;     // 红包对应的等级
+  required float redpack_1 = 2; // 第一个红包金额
+  required float redpack_2 = 3; // 第二个红包金额
+  required float redpack_3 = 4; // 第三个红包金额
+}
+
+// des: 下注粘性红包通知
+// id: 333
+message sc_player_bet_stickiness_notify {
+  required int32 room_type = 1;  // 房间类型
+  required int32 testtype = 2;   // 试玩娱乐类型
+  required uint64 cur_bet = 3;   // 当前下注金额
+  required uint64 total_bet = 4; // 当前等级最大下注金额
+  required int32 cur_level = 5;  // 当前等级
+  repeated pb_player_bet_stickiness_redpack_list_elem redpack_list =
+      6; // 当前可以领取的红包列表
+}
+
+// des: 下注粘性红包领取请求
+// id: 334
+message cs_player_bet_stickiness_redpack_draw_req {
+  required int32 room_type = 1; // 房间类型
+  required int32 testtype = 2;  // 试玩娱乐类型
+  required int32 level = 3;     // 等级
+}
+
+// des: 下注粘性红包领取请求
+// id: 335
+message sc_player_bet_stickiness_redpack_draw_resp {
+  required int32 room_type = 1;      // 房间类型
+  required int32 testtype = 2;       // 试玩娱乐类型
+  required int32 level = 3;          // 等级
+  required uint32 reward_amount = 4; // 领取的金额
+  required string desc = 5; // 说明（当reward_amount为 0 时是错误说明）
+}
+
+// des: 下注限制配置元素
+message pb_bet_lock_config_list_elem {
+  required int32 level = 1;           // 等级
+  required uint64 bet_gold_limit = 2; // 下注金币限制
+  required uint32 next_gen_gold = 3;  // 到达下一条件的累计下注金额
+  required uint32 next_gen_vip = 4;   // 到达下一条件的 vip 等级
+}
+
+// des: 请求下注限制配置信息
+// id: 336
+message cs_bet_lock_config_req {
+  required int32 room_type = 1; // 房间类型
+  required int32 testtype = 2;  // 试玩娱乐类型
+}
+
+// des: 回复下注配置信息
+// id: 337
+message sc_bet_lock_config_resp {
+  required int32 room_type = 1;                      // 房间类型
+  required int32 testtype = 2;                       // 试玩娱乐类型
+  repeated pb_bet_lock_config_list_elem configs = 3; // 配置列表
+}
+
+// des: 玩家下注限制更新通知（一进入房间，等级发生改变时下发）
+// id: 338
+message sc_bet_lock_update_notify {
+  required int32 room_type = 1;                        // 房间类型
+  required int32 testtype = 2;                         // 试玩娱乐类型
+  required pb_bet_lock_config_list_elem cur_level = 3; // 当前等级配置
+  required uint64 total_amount = 4;                    // 总下注金额
+}
+
+// des: 玩家工资查询
+// id: 339
+message cs_player_salary_query_req {}
+
+// des: 玩家工资查询返回
+// id: 340
+message sc_player_salary_query_resp {
+  required uint64 yesterday_earn = 1;   // 昨日赚金
+  required uint64 today_earn = 2;       // 今日赚金
+  required uint64 yesterday_salary = 3; // 昨日工资
+  required bool is_draw = 4;            //  是否已经领取
+}
+
+// des: 玩家工资领取
+// id: 341
+message cs_player_salary_draw_req {}
+
+// des: 玩家工资领取回复
+message sc_player_salary_draw_resp {
+  required uint64 salary = 1;
+  required string desc = 2;
+}
+
+message pb_lottery_item {
+  required uint32 item_id = 1;
+  required uint32 item_num = 2;
+}
+
+message pb_lottery_reward_config {
+  required uint32 index = 1;
+  required pb_lottery_item cost_item = 2;
+  repeated pb_lottery_item reward_items = 3;
+}
+
+// des: 玩家抽奖发起
+// id: 354
+message cs_lottery_draw_req {
+  required uint32 prize_cls = 1; // 抽奖的生效分类，传 0 表示查询剩余次数
+}
+
+// des: 玩家查询抽奖信息回复
+// id: 355
+message sc_lottery_draw_resp {
+  required uint32 left_times = 1; // 剩余次数
+  required uint32 reward_item_id = 2; // 抽到的物品 id ( 0=》查询剩余次数回复)
+  required uint32 reward_item_num = 3;                  // 抽到的物品数量
+  required bool is_reward = 4;                          // 是否抽奖成功
+  repeated pb_lottery_reward_config reward_configs = 5; // 抽奖配置
+}

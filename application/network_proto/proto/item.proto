@@ -1,0 +1,58 @@
+// -------------------------
+// 物品CRUD协议
+// -------------------------
+
+package network;
+
+
+
+// des:物品更新
+// id:30
+message sc_items_update{
+    repeated pb_item_info upd_list = 1;
+}
+
+// des:物品新增
+// id:31
+message sc_items_add{
+    repeated pb_item_info add_list = 1;
+}
+
+// des:物品删除
+// id:32
+message sc_items_delete{
+    repeated string del_list = 1;       // 物品uuid
+}
+
+// des:背包初始化
+// id:33
+message sc_items_init_update{
+    repeated pb_item_info all_list = 1;
+}
+
+// 物品结构
+message pb_item_info{
+    required string uuid 						= 1;
+    required uint32 base_id 						= 2;
+    required uint32 count 						= 3;
+}
+
+// des:物品使用
+// id:34
+message cs_item_use_req{
+    required string item_uuid = 1;
+    required uint32 num = 2;
+}
+
+// des:物品使用返回
+// id:35
+message sc_item_use_reply{
+    required uint32 result = 1;     //0成功 1失败
+    required bytes err_msg = 2;     //错误描述
+}
+
+// des:通用奖励结构
+message pb_reward_info{
+    required uint32 base_id 						= 1;
+    required uint64 count 						= 2;
+}
